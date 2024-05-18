@@ -61,6 +61,7 @@ export default function App() {
   }
 
   async function fetchProductData() {
+    
     try{
       setUsandoCan(false);
       const response = await fetch(apiURL);
