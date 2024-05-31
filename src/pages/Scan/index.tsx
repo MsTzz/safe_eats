@@ -1,9 +1,8 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { View, StyleSheet, Text, StatusBar, TouchableOpacity, Button, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StatusBar, TouchableOpacity, Image, Modal, StyleSheet, Text, Pressable, View, Alert } from 'react-native';
 import { Camera, Code, useCameraDevice, useCameraFormat, useCameraPermission, useCodeScanner, Templates } from 'react-native-vision-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import BottomSheet from '@gorhom/bottom-sheet';
+
 
 export default function Scan() {
 
@@ -17,10 +16,9 @@ export default function Scan() {
 
   const [usandoCan, setUsandoCan] = useState<boolean>(true);
   const camera = useRef<Camera>(null);
-  const bottomSheetref = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["30%", "75%"], []);
   const [codigoScan, setCodigoScan] = useState<string | undefined>('');
   const [scanning, setScanning] = useState<boolean>(true);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
 
   const [img, setImg] = useState<string | null>(null);
@@ -32,14 +30,10 @@ export default function Scan() {
     setImg('');
     setName('');
     setBrands('');
+    setUsandoCan(true);
   }
 
-  const handleCloseAction = () => {
-    bottomSheetref.current?.close();
-    zerandoDadosScan();
-  };
-
-  useEffect(() => {
+   useEffect(() => {
     (async () => {
       const result = await requestPermission();
       setPermission(result);
@@ -78,7 +72,7 @@ export default function Scan() {
     codeTypes: ['ean-8', 'ean-13'],
     onCodeScanned: (codes: Code[]) => {
       if (scanning) {
-        setScanning(false); // Define scanning como false para parar de detectar novos códigos
+        setScanning(false); 
         const scannedCode = codes[0].value;
         setCodigoScan(scannedCode);
         if (scannedCode) {
@@ -101,22 +95,18 @@ export default function Scan() {
         setImg(product.image_front_url);
         setName(product.product_name);
         setBrands(product.brands_tags[0]);
-        handleOpenAction();
+        console.log(name, img, brands);
+        setModalVisible(true);
       }
-
-      console.log(name, img, brands);
+      
     } catch (error) {
       console.error('Erro ao buscar dados da API:', error);
     }
   }
 
-  const handleOpenAction = () => {
-    bottomSheetref.current?.expand();
-  };
-
+  
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+    <View style={styles.container}>
         <StatusBar hidden />
 
         <Camera
@@ -132,44 +122,29 @@ export default function Scan() {
           fps={fps}
         />
 
-        <BottomSheet
-          ref={bottomSheetref}
-          index={-1}
-          snapPoints={snapPoints}
-          backgroundStyle={{ backgroundColor: '#c4ceb0' }}
-          enablePanDownToClose={true}
-          onClose={() => {
-            setUsandoCan(true);
-            zerandoDadosScan();
-          }}
-        >
-          <View style={styles.resultadoAPI}>
-            {img ? (
-              <View>
-                <Image source={{ uri: img }} style={styles.imgStyle} />
-                <Text style={styles.resultText}>{name}</Text>
-                <Text style={styles.resultText}>{brands}</Text>
-              </View>
-            ) : (
-              <Text>Imagem não disponível</Text>
-            )}
-
-            <Button
-              title="Fechar"
-              onPress={() => {
-                setUsandoCan(true);
-                handleCloseAction();
-              }}
-            />
-          </View>
-        </BottomSheet>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(false);
+          }}>
+        </Modal>
+        
+               {/* <View>
+                 <Image source={{ uri: img }} style={styles.imgStyle} />
+                 <Text style={styles.resultText}>{name}</Text>
+                 <Text style={styles.resultText}>{brands}</Text>
+               </View> */}
+           
+           
 
         <TouchableOpacity
           style={styles.ScanButton}
           onPress={() => {
             console.log('Scan');
             setUsandoCan(true);
-            handleCloseAction();
             setScanning(true);
           }}
         >
@@ -178,6 +153,7 @@ export default function Scan() {
 
         <TouchableOpacity
           style={styles.flipButton}
+          
           onPress={() => {
             setFlip(flip === 'back' ? 'front' : 'back');
             console.log('Câmera invertida');
@@ -186,7 +162,6 @@ export default function Scan() {
           <MaterialCommunityIcons name="camera-flip-outline" size={34} color="white" />
         </TouchableOpacity>
       </View>
-    </GestureHandlerRootView>
   );
 }
 
@@ -230,5 +205,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
