@@ -38,6 +38,11 @@
           "enableCodeScanner": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a5e74d32-9886-425e-8046-237c90013293"
+      }
+    }
   }
 }
