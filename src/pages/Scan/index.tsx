@@ -1,28 +1,20 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { View, StyleSheet, Text, StatusBar, TouchableOpacity, Button, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StatusBar, TouchableOpacity, Image, Modal, StyleSheet, Text, View, Platform, Linking, Pressable } from 'react-native';
 import { Camera, Code, useCameraDevice, useCameraFormat, useCameraPermission, useCodeScanner, Templates } from 'react-native-vision-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import BottomSheet from '@gorhom/bottom-sheet';
 
 export default function Scan() {
-
   const [flip, setFlip] = useState<'back' | 'front'>('back'); 
   const device = useCameraDevice(flip);
   const format = useCameraFormat(device, Templates.Snapchat);
   const fps = format?.maxFps ?? 30;
 
   const { hasPermission, requestPermission } = useCameraPermission();
-  const [permission, setPermission] = useState<null | boolean>(null);
-
   const [usandoCan, setUsandoCan] = useState<boolean>(true);
   const camera = useRef<Camera>(null);
-  const bottomSheetref = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["30%", "75%"], []);
   const [codigoScan, setCodigoScan] = useState<string | undefined>('');
   const [scanning, setScanning] = useState<boolean>(true);
-
-
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [img, setImg] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
   const [brands, setBrands] = useState<string | null>(null);
@@ -32,20 +24,15 @@ export default function Scan() {
     setImg('');
     setName('');
     setBrands('');
-  }
-
-  const handleCloseAction = () => {
-    bottomSheetref.current?.close();
-    zerandoDadosScan();
+    setUsandoCan(true);
+    setScanning(true);
   };
 
   useEffect(() => {
     (async () => {
-      const result = await requestPermission();
-      setPermission(result);
+      await requestPermission();
     })();
   }, [requestPermission]);
-
 
   useEffect(() => {
     if (format) {
@@ -53,32 +40,19 @@ export default function Scan() {
     }
   }, [format]);
 
-
-  if (permission === false) {
-    setUsandoCan(false);
-    return (
-      <View style={styles.container}>
-        <Text>Permissão para câmera foi negada. Por favor, ative-a nas configurações.</Text>
-        <TouchableOpacity onPress={requestPermission}>
-          <Text style={styles.buttonText}>Tentar novamente</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (!device) {
-    return (
-      <View style={styles.container}>
-        <Text>Dispositivo de câmera não disponível.</Text>
-      </View>
-    );
-  }
+  const openSettings = () => {
+    if (Platform.OS === 'android') {
+      Linking.openSettings();
+    } else {
+      Linking.openURL('app-settings:');
+    }
+  };
 
   const codeScanner = useCodeScanner({
     codeTypes: ['ean-8', 'ean-13'],
     onCodeScanned: (codes: Code[]) => {
       if (scanning) {
-        setScanning(false); // Define scanning como false para parar de detectar novos códigos
+        setScanning(false);
         const scannedCode = codes[0].value;
         setCodigoScan(scannedCode);
         if (scannedCode) {
@@ -101,24 +75,43 @@ export default function Scan() {
         setImg(product.image_front_url);
         setName(product.product_name);
         setBrands(product.brands_tags[0]);
-        handleOpenAction();
+        console.log(name, img, brands);
+        setModalVisible(true);
       }
-
-      console.log(name, img, brands);
     } catch (error) {
       console.error('Erro ao buscar dados da API:', error);
     }
   }
 
-  const handleOpenAction = () => {
-    bottomSheetref.current?.expand();
-  };
+  if (!device) {
+    return (
+      <View style={styles.container}>
+        <Text>Dispositivo de câmera não disponível.</Text>
+      </View>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.modalView}>
+          <View style={styles.modalContent}>
+            <Text style={styles.text}>
+              Permissão para câmera foi negada. Por favor, ative-a nas configurações.
+            </Text>
+            <TouchableOpacity onPress={openSettings} style={styles.retryButton}>
+              <Text style={[styles.buttonText, { color: 'white' }]}>Tentar novamente</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <StatusBar hidden />
-
+    <View style={styles.container}>
+      <StatusBar hidden />
+      {hasPermission && device && (
         <Camera
           ref={camera}
           style={StyleSheet.absoluteFill}
@@ -131,71 +124,57 @@ export default function Scan() {
           codeScanner={codeScanner}
           fps={fps}
         />
+      )}
 
-        <BottomSheet
-          ref={bottomSheetref}
-          index={-1}
-          snapPoints={snapPoints}
-          backgroundStyle={{ backgroundColor: '#c4ceb0' }}
-          enablePanDownToClose={true}
-          onClose={() => {
-            setUsandoCan(true);
-            zerandoDadosScan();
-          }}
-        >
-          <View style={styles.resultadoAPI}>
-            {img ? (
-              <View>
-                <Image source={{ uri: img }} style={styles.imgStyle} />
-                <Text style={styles.resultText}>{name}</Text>
-                <Text style={styles.resultText}>{brands}</Text>
-              </View>
-            ) : (
-              <Text>Imagem não disponível</Text>
-            )}
+      <TouchableOpacity
+        style={styles.ScanButton}
+        onPress={() => {
+          console.log('Scan');
+          setUsandoCan(true);
+          setScanning(true);
+        }}
+      >
+        <MaterialCommunityIcons name="barcode-scan" size={32} color="white" />
+      </TouchableOpacity>
 
-            <Button
-              title="Fechar"
-              onPress={() => {
-                setUsandoCan(true);
-                handleCloseAction();
-              }}
-            />
-          </View>
-        </BottomSheet>
+      <TouchableOpacity
+        style={styles.flipButton}
+        onPress={() => {
+          setFlip(flip === 'back' ? 'front' : 'back');
+          console.log('Câmera invertida');
+        }}
+      >
+        <MaterialCommunityIcons name="camera-flip-outline" size={34} color="white" />
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.ScanButton}
-          onPress={() => {
-            console.log('Scan');
-            setUsandoCan(true);
-            handleCloseAction();
-            setScanning(true);
-          }}
-        >
-          <MaterialCommunityIcons name="barcode-scan" size={32} color="white" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.flipButton}
-          onPress={() => {
-            setFlip(flip === 'back' ? 'front' : 'back');
-            console.log('Câmera invertida');
-          }}
-        >
-          <MaterialCommunityIcons name="camera-flip-outline" size={34} color="white" />
-        </TouchableOpacity>
-      </View>
-    </GestureHandlerRootView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.text}>Nome: {name}</Text>
+          <Text style={styles.text}>Marca: {brands}</Text>
+          {img && <Image source={{ uri: img }} style={styles.imgStyle} />}
+          <Pressable
+            style={styles.button}
+            onPress={() => {
+              setModalVisible(!modalVisible);
+              zerandoDadosScan();
+            }}
+          >
+            <Text style={styles.buttonText}>Fechar</Text>
+          </Pressable>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   flipButton: {
     position: 'absolute',
     top: 30,
@@ -205,8 +184,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   buttonText: {
-    color: 'white',
     fontSize: 16,
+    color: 'white',
   },
   ScanButton: {
     position: 'absolute',
@@ -216,19 +195,45 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
   },
-  resultText: {
-    color: 'white',
-    fontSize: 16,
-    textAlign: "center",
-  },
   imgStyle: {
     width: 300,
     height: 300,
     resizeMode: 'contain',
   },
-  resultadoAPI: {
+  modalView: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'black',
+  },
+  text: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  button: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#566332',
+    borderRadius: 5,
+  },
+  modalContent: {
+    backgroundColor:
+    'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  retryButton: {
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
   },
 });

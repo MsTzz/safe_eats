@@ -1,22 +1,35 @@
+import { optEnum } from '@shopify/react-native-skia/lib/typescript/src/skia/web/Host';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { _View, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCameraPermission } from 'react-native-vision-camera';
 
 export default function Search() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.Text}>Pagina Search</Text>
-    </View>
-  );
+  const { hasPermission } = useCameraPermission();
+
+  
+ 
+  
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: '#c4ceb0',
   },
-  Text:{
+  text: {
     fontSize: 25,
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
+  button: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#566332',
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });
