@@ -43,12 +43,10 @@ Para obter uma cópia local e executá-la, siga estes passos simples:
 3. Instale as dependências:
    ```sh
    yarn install
-   # ou
-   npm install
    ```
 4. Inicie o servidor de desenvolvimento:
    ```sh
-   expo start
+   npx expo run:android
    ```
 
 ## Uso

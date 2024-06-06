@@ -2,8 +2,24 @@ import React, { useEffect, useState, useRef } from 'react';
 import { StatusBar, TouchableOpacity, Image, Modal, StyleSheet, Text, View, Platform, Linking, Pressable } from 'react-native';
 import { Camera, Code, useCameraDevice, useCameraFormat, useCameraPermission, useCodeScanner, Templates } from 'react-native-vision-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-export default function Scan() {
+type RootStackParamList = {
+  Main: undefined;
+  Scan: undefined;
+  API: undefined;
+};
+
+type SignInScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'Scan'
+>;
+
+type SignInProps = {
+  navigation: SignInScreenNavigationProp;
+};
+
+export default function Scan({ navigation }: SignInProps) {
   const [flip, setFlip] = useState<'back' | 'front'>('back'); 
   const device = useCameraDevice(flip);
   const format = useCameraFormat(device, Templates.Snapchat);
@@ -96,7 +112,7 @@ export default function Scan() {
       <View style={styles.container}>
         <View style={styles.modalView}>
           <View style={styles.modalContent}>
-            <Text style={styles.text}>
+            <Text style={[{ color: 'black' }]}>
               Permissão para câmera foi negada. Por favor, ative-a nas configurações.
             </Text>
             <TouchableOpacity onPress={openSettings} style={styles.retryButton}>
@@ -119,7 +135,7 @@ export default function Scan() {
           isActive={usandoCan}
           preview={usandoCan}
           orientation="portrait-upside-down"
-          resizeMode="contain"
+          resizeMode="cover"
           format={format}
           codeScanner={codeScanner}
           fps={fps}
@@ -163,6 +179,7 @@ export default function Scan() {
             style={styles.button}
             onPress={() => {
               setModalVisible(!modalVisible);
+              navigation.navigate('API'); // Navega para a tela de API quando fecha o modal
               zerandoDadosScan();
             }}
           >
@@ -215,7 +232,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: 'black',
+    color: 'white',
   },
   button: {
     marginTop: 20,
@@ -224,8 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   modalContent: {
-    backgroundColor:
-    'white',
+    backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
