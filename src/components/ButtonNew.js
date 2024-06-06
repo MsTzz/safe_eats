@@ -7,25 +7,28 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 export default function ButtonNew({ focused, size, color }){
     return(
         <View style={[styles.container, {
-            width : focused ? 65 : 60,
-            height: focused ? 65 : 60
-            }]}>
-            <MaterialCommunityIcons name="barcode-scan" size={size} color={color} />
+            width: focused ? 70 : 65,
+            height: focused ? 70 : 65,
+            
+            borderRadius: focused ? 23 : 15,
+        }]}>
+        <MaterialCommunityIcons name="barcode-scan" size={focused ? 30 : size} 
+            color={ color
+        } />
         </View>
     )
 
 }
 
 
-
 const styles = StyleSheet.create({
     container:{
         
-        borderRadius: 15,
+        backgroundColor:'#566332',
         justifyContent:'center',
         alignItems: 'center',
         marginBottom: 35,
-        backgroundColor: '#566332',
+        
         
     }
 

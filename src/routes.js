@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,6 +9,7 @@ import SignIn from './pages/Signin';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Scan from './pages/Scan';
+import InfoAPI from './pages/Scan/infoAPI';
 import History from './pages/History';
 import Profile from './pages/Profile';
 import ButtonNew from './components/ButtonNew';
@@ -17,29 +17,7 @@ import ButtonNew from './components/ButtonNew';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function RoutesInicio() {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen
-                name="Welcome"
-                component={Welcome}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="SignIn"
-                component={SignIn}
-                options={{ headerShown: false}}
-            />
-            <Stack.Screen
-                name="Main"
-                component={Routes}
-                options={{ headerShown: false }}
-            />
-        </Stack.Navigator>
-    );
-}
-
-function Routes() {
+function MainTabs() {
     return (
         <Tab.Navigator
             screenOptions={{
@@ -50,7 +28,7 @@ function Routes() {
                     paddingTop: 5,
                     height: 70,
                     borderRadius: 25,
-                    bottom: 14,
+                    bottom: 10,
                     left: 14,
                     right: 14,
                     position: 'absolute'
@@ -62,9 +40,11 @@ function Routes() {
             <Tab.Screen
                 name="Home"
                 component={Home}
+                Style
                 options={{
-                    tabBarIcon: ({ size, color }) => (
-                        <Entypo name="home" size={size} color={color} />
+                    
+                    tabBarIcon: ({ focused, size, color }) => (
+                        <Entypo name="home" size={focused ? 30 : size} color={color} />
                     ),
                     headerStyle: {
                         backgroundColor: '#c4ceb0',
@@ -78,8 +58,8 @@ function Routes() {
                 name="Procurar"
                 component={Search}
                 options={{
-                    tabBarIcon: ({ size, color }) => (
-                        <Feather name="search" size={size} color={color} />
+                    tabBarIcon: ({ focused, size, color }) => (
+                        <Feather name="search" size={focused ? 30 : size} color={color} />
                     ),
                     headerStyle: {
                         backgroundColor: '#c4ceb0',
@@ -93,6 +73,18 @@ function Routes() {
                 name="Scan"
                 component={Scan}
                 options={{
+                    tabBarStyle: {
+                        backgroundColor: '#121212',
+                         borderColor: 'transparent',
+                         paddingBottom: 10,
+                         paddingTop: 5,
+                         height: 70,
+                         borderRadius: 30,
+                         bottom: 20,
+                         left: 38,
+                         right: 38,
+                         position: 'absolute'  
+                    },
                     tabBarLabel: '',
                     headerShown: false,
                     tabBarIcon: ({ focused, size, color }) => (
@@ -104,8 +96,8 @@ function Routes() {
                 name="Historico"
                 component={History}
                 options={{
-                    tabBarIcon: ({ size, color }) => (
-                        <FontAwesome name="list" size={size} color={color} />
+                    tabBarIcon: ({ focused, size, color }) => (
+                        <FontAwesome name="list" size={focused ? 30 : size} color={color} />
                     ),
                     headerStyle: {
                         backgroundColor: '#c4ceb0',
@@ -119,8 +111,8 @@ function Routes() {
                 name="Perfil"
                 component={Profile}
                 options={{
-                    tabBarIcon: ({ size, color }) => (
-                        <FontAwesome name="user" size={size} color={color} />
+                    tabBarIcon: ({ focused, size, color }) => (
+                        <FontAwesome name="user" size={focused ? 30 : size} color={color} />
                     ),
                     headerStyle: {
                         backgroundColor: '#c4ceb0',
@@ -134,4 +126,35 @@ function Routes() {
     );
 }
 
-export default RoutesInicio;
+function Routes() {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen
+                name="Welcome"
+                component={Welcome}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="SignIn"
+                component={SignIn}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Main"
+                component={MainTabs}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Scan"
+                component={Scan}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="API"
+                component={InfoAPI}
+            />
+        </Stack.Navigator>
+    );
+}
+
+export default Routes;
