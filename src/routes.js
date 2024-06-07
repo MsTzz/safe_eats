@@ -28,9 +28,9 @@ function MainTabs() {
                     paddingTop: 5,
                     height: 70,
                     borderRadius: 25,
-                    bottom: 10,
-                    left: 14,
-                    right: 14,
+                    bottom: 15,
+                    left: 20,
+                    right: 20,
                     position: 'absolute'
                 },
                 tabBarActiveTintColor: '#ecf081',
@@ -79,9 +79,9 @@ function MainTabs() {
                          paddingTop: 5,
                          height: 70,
                          borderRadius: 30,
-                         bottom: 20,
-                         left: 38,
-                         right: 38,
+                         bottom: 15,
+                         left: 40,
+                         right: 40,
                          position: 'absolute'  
                     },
                     tabBarLabel: '',
@@ -124,7 +124,7 @@ function MainTabs() {
         </Tab.Navigator>
     );
 }
-
+ 
 function Routes() {
     return (
         <Stack.Navigator>
@@ -151,6 +151,7 @@ function Routes() {
             <Stack.Screen
                 name="API"
                 component={InfoAPI}
+                options={{ headerTitle: 'Detalhes do Produto' }}
             />
         </Stack.Navigator>
     );

@@ -7,11 +7,11 @@ export default function ButtonNew({ focused, size, color }) {
         <View style={[styles.container, {
             width: focused ? 70 : 65,
             height: focused ? 70 : 65,
-            borderRadius: focused ? 35 : 32.5, 
+            borderRadius: focused ? 25 : 20, 
         }]}>
             <MaterialCommunityIcons 
                 name="barcode-scan" 
-                size={focused ? 30 : size} 
+                size={focused ? 35 : 30} 
                 color={color} 
             />
         </View>
