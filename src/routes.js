@@ -40,7 +40,6 @@ function MainTabs() {
             <Tab.Screen
                 name="Home"
                 component={Home}
-                Style
                 options={{
                     
                     tabBarIcon: ({ focused, size, color }) => (
