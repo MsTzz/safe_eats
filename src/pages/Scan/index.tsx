@@ -20,8 +20,8 @@ type SignInProps = {
 const Scan: React.FC<SignInProps> = ({ navigation }) => {
   const [flip, setFlip] = useState<'back' | 'front'>('back');
   const device = useCameraDevice(flip);
-  const format = useCameraFormat(device, Templates.Snapchat);
-  const fps = format?.maxFps ?? 30;
+  //const format = useCameraFormat(device, Templates.Snapchat);
+  //const fps = format?.maxFps ?? 30;
 
   const { hasPermission, requestPermission } = useCameraPermission();
   const camera = useRef<Camera>(null);
@@ -51,15 +51,18 @@ const Scan: React.FC<SignInProps> = ({ navigation }) => {
     })();
   }, [requestPermission]);
 
-  useEffect(() => {
-    if (format) {
-      console.log('Camera format:', format);
-    }
-  }, [format]);
+  // useEffect(() => {
+  //   if (format) {
+  //     console.log('Camera format:', format);
+  //   }
+  // }, [format]);
 
   const openSettings = () => {
-    const settingsUrl = Platform.OS === 'android' ? 'app-settings:' : 'app-settings:';
-    Linking.openURL(settingsUrl);
+    if (Platform.OS === 'android') {
+      Linking.openSettings();
+    } else {
+      Linking.openURL('app-settings:');
+    }
   };
 
   const handleCodeScanned = async (codes: Code[]) => {
@@ -143,9 +146,9 @@ const Scan: React.FC<SignInProps> = ({ navigation }) => {
           preview={true}
           orientation="portrait-upside-down"
           resizeMode="cover"
-          format={format}
+          //format={format}
           codeScanner={codeScanner}
-          fps={fps}
+          //fps={fps}
         />
       )}
 
@@ -212,6 +215,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   topContainer: {
     flexDirection: 'row',
