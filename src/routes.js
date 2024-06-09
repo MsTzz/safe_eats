@@ -6,6 +6,7 @@ import { Entypo, Feather, FontAwesome } from '@expo/vector-icons';
 // Importe seus componentes de tela
 import Welcome from './pages/Welcome';
 import SignIn from './pages/Signin';
+import Register from './pages/Register';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Scan from './pages/Scan';
@@ -136,6 +137,11 @@ function Routes() {
             <Stack.Screen
                 name="SignIn"
                 component={SignIn}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Register"
+                component={Register}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
