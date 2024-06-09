@@ -8,6 +8,7 @@ type RootStackParamList = {
     Welcome: undefined;
     SignIn: undefined;
     Main: undefined;
+    Register: undefined;
 };
 
 type SignInScreenNavigationProp = StackNavigationProp<
@@ -46,7 +47,10 @@ export default function SignIn({ navigation }: SignInProps) {
                     <Text style={styles.buttonText}>Acessar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.buttonRegister}>
+                <TouchableOpacity 
+                    style={styles.buttonRegister}
+                    onPress={() => navigation.navigate('Register')} // Navegar para "Register" que usa a função Routes
+                >
                     <Text style={styles.registerText}>Não possui uma conta? Cadastre-se</Text>
                 </TouchableOpacity>
 
