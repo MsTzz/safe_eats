@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StatusBar, TouchableOpacity, Image, Modal, StyleSheet, Text, View, Platform, Linking, Pressable, ActivityIndicator, Dimensions } from 'react-native';
-import { Camera, Code, useCameraDevice, useCameraFormat, useCameraPermission, useCodeScanner, Templates } from 'react-native-vision-camera';
+import { StatusBar, TouchableOpacity, Image, Modal, StyleSheet, Text, View, Platform, Linking, Pressable, ActivityIndicator } from 'react-native';
+import { Camera, Code, useCameraDevice, useCameraPermission, useCodeScanner, Templates, useCameraFormat } from 'react-native-vision-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { fetchProductData } from './apiUtils';
@@ -17,11 +17,11 @@ type SignInProps = {
   navigation: SignInScreenNavigationProp;
 };
 
-const Scan: React.FC<SignInProps> = ({ navigation }) => {
+export default function Scan({ navigation }: SignInProps) {
   const [flip, setFlip] = useState<'back' | 'front'>('back');
   const device = useCameraDevice(flip);
-  //const format = useCameraFormat(device, Templates.Snapchat);
-  //const fps = format?.maxFps ?? 30;
+  const format = useCameraFormat(device, Templates.Snapchat);
+  const fps = format?.maxFps ?? 30;
 
   const { hasPermission, requestPermission } = useCameraPermission();
   const camera = useRef<Camera>(null);
@@ -31,17 +31,14 @@ const Scan: React.FC<SignInProps> = ({ navigation }) => {
   const [scanning, setScanning] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [productImage, setProductImage] = useState<string | undefined>();
-  const [productBrands, setProductBrands] = useState<string | undefined>();
+  const [productBrands, setProductBrands] = useState<string[] | undefined>();
   const [error, setError] = useState<string | undefined>();
-
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
 
   const zerarDadosScan = () => {
     setCodigoScan(undefined);
     setScanning(true);
     setProductImage(undefined);
-    setProductBrands(undefined);
+    setProductBrands([]);
     setError(undefined);
   };
 
@@ -50,12 +47,6 @@ const Scan: React.FC<SignInProps> = ({ navigation }) => {
       await requestPermission();
     })();
   }, [requestPermission]);
-
-  // useEffect(() => {
-  //   if (format) {
-  //     console.log('Camera format:', format);
-  //   }
-  // }, [format]);
 
   const openSettings = () => {
     if (Platform.OS === 'android') {
@@ -75,9 +66,10 @@ const Scan: React.FC<SignInProps> = ({ navigation }) => {
         setModalVisible(true);
         try {
           setLoading(true);
-          const { image_front_url, brands } = await fetchProductData(scannedCode);
-          setProductImage(image_front_url);
-          setProductBrands(brands);
+          const fetchedProduct = await fetchProductData(scannedCode);
+          setProductImage(fetchedProduct.image_front_url); 
+          setProductBrands(fetchedProduct.brands); 
+          setError(undefined); 
         } catch (error) {
           setError('Erro ao buscar dados da API');
         } finally {
@@ -146,9 +138,9 @@ const Scan: React.FC<SignInProps> = ({ navigation }) => {
           preview={true}
           orientation="portrait-upside-down"
           resizeMode="cover"
-          //format={format}
+          format={format}
           codeScanner={codeScanner}
-          //fps={fps}
+          fps={fps}
         />
       )}
 
@@ -325,6 +317,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-export default Scan;
-

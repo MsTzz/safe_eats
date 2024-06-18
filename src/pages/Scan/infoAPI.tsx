@@ -13,9 +13,9 @@ type InfoAPIProps = {
 export default function InfoAPI({ route }: InfoAPIProps) {
   const { scannedCode } = route.params;
   const [loading, setLoading] = useState(true);
-  const [product, setProduct] = useState<{ name?: string; brands: string; image_front_url?: string }>({
+  const [product, setProduct] = useState<{ name?: string; brands: string[]; image_front_url?: string }>({
     name: undefined,
-    brands: '',
+    brands: [],
     image_front_url: undefined,
   });
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +23,12 @@ export default function InfoAPI({ route }: InfoAPIProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { image_front_url, brands, name } = await fetchProductData(scannedCode);
-        setProduct({ image_front_url, brands, name });
+        const fetchedProduct = await fetchProductData(scannedCode);
+        setProduct({
+          name: fetchedProduct.name,
+          brands: fetchedProduct.brands,
+          image_front_url: fetchedProduct.image_front_url,
+        });
         setLoading(false);
       } catch (error) {
         setError('Erro ao buscar dados da API');
