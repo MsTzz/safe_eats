@@ -157,7 +157,11 @@ function Routes() {
             <Stack.Screen
                 name="API"
                 component={InfoAPI}
-                options={{ headerTitle: 'Detalhes do Produto' }}
+                options={{ 
+                    headerStyle: {
+                        backgroundColor: '#c4ceb0',
+                    },
+                    headerTitle: 'Detalhes do Produto' }}
             />
         </Stack.Navigator>
     );

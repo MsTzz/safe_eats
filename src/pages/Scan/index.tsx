@@ -31,14 +31,14 @@ export default function Scan({ navigation }: SignInProps) {
   const [scanning, setScanning] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [productImage, setProductImage] = useState<string | undefined>();
-  const [productBrands, setProductBrands] = useState<string[] | undefined>();
+  const [productName, setProductName] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
 
   const zerarDadosScan = () => {
     setCodigoScan(undefined);
     setScanning(true);
     setProductImage(undefined);
-    setProductBrands([]);
+    setProductName(undefined);
     setError(undefined);
   };
 
@@ -66,9 +66,9 @@ export default function Scan({ navigation }: SignInProps) {
         setModalVisible(true);
         try {
           setLoading(true);
-          const fetchedProduct = await fetchProductData(scannedCode);
-          setProductImage(fetchedProduct.image_front_url); 
-          setProductBrands(fetchedProduct.brands); 
+          const productData = await fetchProductData(scannedCode);
+          setProductImage(productData.images?.front); 
+          setProductName(productData.productName); 
           setError(undefined); 
         } catch (error) {
           setError('Erro ao buscar dados da API');
@@ -164,8 +164,8 @@ export default function Scan({ navigation }: SignInProps) {
                   {productImage && (
                     <Image source={{ uri: productImage }} style={styles.productImage} />
                   )}
-                  {productBrands && (
-                    <Text style={styles.productBrands}>Nome do produto: {productBrands}</Text>
+                  {productName && (
+                    <Text style={styles.productBrands}>Nome do produto: {productName}</Text>
                   )}
                   {error && (
                     <Text style={styles.errorText}>{error}</Text>
