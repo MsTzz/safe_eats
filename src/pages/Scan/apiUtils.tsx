@@ -1,5 +1,5 @@
 interface ProductNutriments {
-  energy_value?: strding;
+  energy_value?: string;
   proteins?: string;
   fat?: string;
   saturated_fat?: string;
